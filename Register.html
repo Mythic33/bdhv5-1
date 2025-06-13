@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<!-- saved from url=(0063)file:///G:/Web%20%C4%91%C4%83ng%20k%C3%AD%20.html/Register.html -->
+<html lang="vi"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng kí tài khoản Chuyên nghiệp V2</title>
+    <link href="./Register_files/css2" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --text-color-dark: #212529;
+            --text-color-medium: #343a40; /* Đậm hơn một chút cho label */
+            --text-color-light: #6c757d;
+            --border-color: #ced4da;
+            --input-focus-border: #80bdff;
+            --input-focus-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+            --background-color: #f4f7f6; /* Một chút xanh lá cây rất nhạt */
+            --container-background: #ffffff;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --warning-text-color: #856404;
+            --success-color: #28a745;
+            --info-color-text: #0c5460;
+            --info-color-bg: #d1ecf1;
+            --info-color-border: #bee5eb;
+
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Roboto', sans-serif;
+
+            /* Title 3D colors */
+            --title-color-base: #2c3e50; /* Màu chính của chữ */
+            --title-shadow-highlight: rgba(255, 255, 255, 0.5); /* Bóng sáng phía trên */
+            --title-shadow-dark1: #1a252f;
+            --title-shadow-dark2: #111a20;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color-medium);
+        }
+
+        .container {
+            background-color: var(--container-background);
+            padding: 40px 50px;
+            border-radius: 16px; /* Bo tròn hơn nữa */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12), 0 5px 15px rgba(0,0,0,0.08); /* Bóng đổ rõ ràng hơn */
+            width: 100%;
+            max-width: 580px; /* Tăng nhẹ kích thước container */
+            transition: all 0.3s ease-in-out;
+        }
+
+        .title-3d-animated {
+            text-align: center;
+            font-family: var(--font-heading);
+            font-size: 36px; /* Kích thước lớn hơn */
+            font-weight: 800; /* Rất đậm */
+            color: var(--title-color-base);
+            margin-bottom: 40px;
+            position: relative; /* Cho hiệu ứng 3D */
+            text-transform: uppercase; /* VIẾT HOA */
+            letter-spacing: 1px;
+            /* Hiệu ứng 3D cơ bản với text-shadow */
+            text-shadow:
+                /* Highlight nhẹ phía trên */
+                0px -1px 0px var(--title-shadow-highlight),
+                /* Bóng đổ chính tạo độ sâu */
+                1px 1px 0px var(--title-shadow-dark1),
+                2px 2px 0px var(--title-shadow-dark1),
+                3px 3px 0px var(--title-shadow-dark2),
+                4px 4px 0px var(--title-shadow-dark2),
+                /* Bóng mờ nhẹ phía xa */
+                5px 5px 8px rgba(0,0,0,0.3);
+            animation: title-pulse-effect 4s infinite ease-in-out;
+        }
+
+        @keyframes title-pulse-effect {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+                text-shadow:
+                    0px -1px 0px var(--title-shadow-highlight),
+                    1px 1px 0px var(--title-shadow-dark1),
+                    2px 2px 0px var(--title-shadow-dark1),
+                    3px 3px 0px var(--title-shadow-dark2),
+                    4px 4px 0px var(--title-shadow-dark2),
+                    5px 5px 8px rgba(0,0,0,0.3);
+            }
+            50% {
+                transform: scale(1.02); /* Phóng to nhẹ */
+                opacity: 0.95; /* Giảm nhẹ độ trong suốt */
+                /* Tăng nhẹ độ mờ của bóng xa để tạo cảm giác "thở" */
+                text-shadow:
+                    0px -1px 1px var(--title-shadow-highlight), /* Glow nhẹ */
+                    1px 1px 0px var(--title-shadow-dark1),
+                    2px 2px 0px var(--title-shadow-dark1),
+                    3px 3px 0px var(--title-shadow-dark2),
+                    4px 4px 0px var(--title-shadow-dark2),
+                    6px 6px 12px rgba(0,0,0,0.4); /* Bóng mờ rộng hơn */
+            }
+        }
+
+
+        .form-group {
+            margin-bottom: 28px; /* Tăng khoảng cách */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            font-size: 1.05rem; /* TĂNG SIZE CHỮ CHO LABEL */
+            color: var(--text-color-medium);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 15px 18px; /* Tăng padding */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-color-dark);
+            box-sizing: border-box;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="password"]:focus {
+            border-color: var(--input-focus-border);
+            outline: none;
+            box-shadow: var(--input-focus-shadow);
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input[type="password"],
+        .password-wrapper input[type="text"] {
+            padding-right: 65px; /* Dành không gian cho nút Hiện/Ẩn */
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1px;
+            top: 1px;
+            bottom: 1px;
+            width: 60px;
+            background-color: transparent;
+            border: none;
+            border-left: 1px solid var(--border-color);
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem; /* Tăng nhẹ size chữ nút */
+            color: var(--primary-color);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, color 0.2s;
+        }
+         .toggle-password:hover {
+            background-color: rgba(0, 123, 255, 0.08);
+            color: var(--primary-hover-color);
+         }
+
+        .char-count-note {
+            font-size: 0.88rem;
+            color: var(--text-color-light);
+            margin-top: 8px;
+            min-height: 1.2em;
+        }
+
+        .blinking-red-text {
+            color: var(--danger-color) !important;
+            animation: blink-animation 1s infinite; /* Chậm hơn một chút */
+        }
+
+        @keyframes blink-animation { /* Giữ nguyên hiệu ứng này vì nó cho char count */
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .password-strength-note {
+            font-size: 0.88rem;
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            min-height: 1.2em;
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        .password-strength-note p {
+            margin: 0 0 6px 0;
+            font-weight: 500;
+        }
+        .password-strength-note span {
+            font-size: 0.9em;
+            display: block;
+            line-height: 1.45;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .weak {
+            color: var(--danger-color);
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .medium {
+            color: var(--warning-text-color);
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        .strong { /* Xanh ngọc */
+            color: var(--info-color-text);
+            background-color: var(--info-color-bg);
+            border-color: var(--info-color-border);
+        }
+        .very-strong { /* Xanh lá */
+            color: #155724; /* Green text */
+            background-color: #d4edda; /* Light green background */
+            border-color: #c3e6cb; /* Green border */
+        }
+
+
+        .submit-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-hover-color)); /* Gradient cho nút */
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05rem; /* Tăng size chữ nút */
+            font-weight: 500;
+            font-family: var(--font-body);
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: linear-gradient(45deg, var(--primary-hover-color), var(--primary-color));
+            box-shadow: 0 6px 15px rgba(0, 100, 200, 0.35);
+            transform: translateY(-2px); /* Hiệu ứng nhấc lên */
+        }
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0px);
+            box-shadow: 0 3px 8px rgba(0, 80, 180, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+            opacity: 0.75;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title-3d-animated">Đăng Ký Tài Khoản</h1>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="username">Tên đăng nhập:</label>
+                <input type="text" id="username" name="username" required="" placeholder="Nhập tên đăng nhập của bạn">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <div class="password-wrapper">
+                    <input type="text" id="password" name="password" required="" placeholder="Nhập mật khẩu">
+                    <button type="button" class="toggle-password" id="togglePassword">Ẩn</button>
+                </div>
+                <div class="char-count-note" id="charCountNote">Đã nhập: 8 Kí tự.</div>
+                <div class="password-strength-note weak" id="passwordStrengthNote"><p>Mật khẩu yếu</p><span>Nên kết hợp đủ chữ thường, chữ HOA, số và ký tự đặc biệt.</span></div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn" disabled="">Đăng Ký</button>
+        </form>
+    </div>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const togglePasswordButton = document.getElementById('togglePassword');
+        const charCountNote = document.getElementById('charCountNote');
+        const passwordStrengthNote = document.getElementById('passwordStrengthNote');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Toggle password visibility
+        togglePasswordButton.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'Hiện' : 'Ẩn';
+        });
+
+        // =================================================================
+        // == LOGIC KIỂM TRA MẬT KHẨU ĐÃ ĐƯỢC CẬP NHẬT THEO YÊU CẦU ==
+        // =================================================================
+        passwordInput.addEventListener('input', function () {
+            const password = this.value;
+            const length = password.length;
+
+            // --- Cập nhật & Reset trạng thái ---
+            charCountNote.textContent = length > 0 ? `Đã nhập: ${length} Kí tự.` : '';
+            charCountNote.classList.remove('blinking-red-text');
+            passwordStrengthNote.className = 'password-strength-note'; // Reset class
+            passwordStrengthNote.innerHTML = '';
+            submitBtn.disabled = true; // Tắt nút đăng ký mặc định
+
+            // --- B1: Kiểm tra độ dài tối thiểu ---
+            if (length === 0) {
+                return; // Không làm gì nếu chưa nhập
+            }
+
+            if (length < 8) {
+                passwordStrengthNote.innerHTML = `<p>Mật khẩu phải từ 8 ký tự trở lên.</p>`;
+                passwordStrengthNote.className = 'password-strength-note error-message';
+                charCountNote.classList.add('blinking-red-text');
+                return; // Dừng lại nếu không đủ dài
+            }
+
+            // --- B2: Kiểm tra sự hiện diện của các loại ký tự ---
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasNumbers = /[0-9]/.test(password);
+            const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            // --- B3: Tính điểm dựa trên số loại ký tự có mặt ---
+            let score = 0;
+            if (hasLowerCase) score++;
+            if (hasUpperCase) score++;
+            if (hasNumbers) score++;
+            if (hasSpecialChars) score++;
+
+            // --- B4: Phân loại độ mạnh và đưa ra gợi ý ---
+            let strengthText = '';
+            let strengthClass = '';
+            let suggestions = '';
+
+            switch (score) {
+                case 1:
+                case 2:
+                    strengthText = 'Mật khẩu yếu';
+                    strengthClass = 'weak';
+                    suggestions = 'Nên kết hợp đủ chữ thường, chữ HOA, số và ký tự đặc biệt.';
+                    break;
+                case 3:
+                    strengthText = 'Mật khẩu trung bình';
+                    strengthClass = 'medium';
+                    suggestions = 'Tốt! Thêm 1 loại ký tự còn lại để mật khẩu đạt mức "Mạnh".';
+                    break;
+                case 4:
+                    if (length >= 15) {
+                        strengthText = 'Mật khẩu rất mạnh';
+                        strengthClass = 'very-strong';
+                        suggestions = 'Mật khẩu của bạn đã đạt mức bảo mật cao nhất!';
+                    } else {
+                        strengthText = 'Mật khẩu mạnh';
+                        strengthClass = 'strong';
+                        suggestions = 'Tuyệt vời! Tăng thêm độ dài (15+ ký tự) để đạt "Rất mạnh".';
+                    }
+                    break;
+            }
+
+            // --- B5: Hiển thị kết quả và bật/tắt nút Đăng ký ---
+            passwordStrengthNote.innerHTML = `<p>${strengthText}</p>${suggestions ? `<span>${suggestions}</span>` : ''}`;
+            if (strengthClass) {
+                passwordStrengthNote.classList.add(strengthClass);
+            }
+
+            // Chỉ bật nút khi mật khẩu là "Mạnh" hoặc "Rất Mạnh"
+            if (strengthClass === 'strong' || strengthClass === 'very-strong') {
+                submitBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            if (!submitBtn.disabled) {
+                alert('Biểu mẫu đã sẵn sàng để gửi đi!');
+            } else {
+                alert('Vui lòng nhập mật khẩu hợp lệ để đăng ký.');
+            }
+        });
+
+        // Đảm bảo nút bị tắt khi trang tải lần đầu
+        submitBtn.disabled = true;
+    </script>
+
+</body></html>

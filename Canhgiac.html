@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thực hành: Cảnh giác Nơi Công cộng</title>
+    
+    <style>
+        /* --- General Styles --- */
+        :root {
+            --primary-color: #17a2b8;
+            --primary-dark: #138496;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --background-color: #f4f6f9;
+            --container-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 720px;
+            box-sizing: border-box;
+        }
+        
+        /* --- Updated Title Style --- */
+        .title-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .title-container h1 {
+            font-size: 1.5em;
+            font-weight: 500;
+            margin: 0;
+            color: #555;
+            text-transform: uppercase;
+        }
+        .title-container h2 {
+            font-size: 2.1em;
+            margin: 5px 0 0 0;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        
+        .activity-container {
+            background-color: var(--container-bg);
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px 32px;
+        }
+
+        .instructions {
+            background-color: #e2f6f8;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+        
+        .button {
+            display: inline-block; background-color: var(--primary-color); color: #fff;
+            padding: 12px 24px; border: none; border-radius: 6px; font-size: 16px;
+            font-weight: bold; cursor: pointer; text-align: center;
+            transition: background-color 0.2s, transform 0.2s; margin-top: 20px;
+        }
+        .button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        
+        .hidden { display: none; }
+
+        /* --- Main Tab Navigation --- */
+        #tab-navigation {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 0; 
+        }
+        .tab-btn {
+            flex-grow: 1; background-color: #e9ecef; color: #495057; border: 1px solid #dee2e6;
+            padding: 12px 15px; font-size: 1em; font-weight: 600; border-radius: 8px 8px 0 0;
+            cursor: pointer; transition: all 0.2s ease-in-out; position: relative;
+            top: 1px; text-align: center;
+        }
+        .tab-btn.active {
+            background-color: var(--container-bg); color: var(--primary-color);
+            border-top: 3px solid var(--primary-color); border-bottom: 1px solid var(--container-bg);
+        }
+
+        /* --- Activity 3.1: Wi-Fi List --- */
+        #wifi-list { list-style: none; padding: 0; border: 1px solid #ddd; border-radius: 8px; }
+        .wifi-item { 
+            display: flex; align-items: center; padding: 15px; cursor: pointer; 
+            border-bottom: 1px solid #eee; transition: background-color 0.2s;
+        }
+        .wifi-item:last-child { border-bottom: none; }
+        .wifi-item:hover { background-color: #f8f9fa; }
+        .wifi-item .icon { margin-right: 15px; font-size: 1.2em; }
+        .wifi-item .feedback { margin-left: auto; font-style: italic; font-size: 0.9em; }
+
+        /* --- Activity 3.2: Scenarios --- */
+        .scenario-tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        .scenario-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #6c757d;
+        }
+        .scenario-tab.active {
+            font-weight: 700;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        .scenario-box h3 { margin-top: 0; }
+        .scenario-options .option {
+            display: block; width: 100%; background-color: #f8f9fa; border: 1px solid #dee2e6;
+            padding: 15px; margin-bottom: 10px; border-radius: 6px; text-align: left; cursor: pointer;
+        }
+        .scenario-options .option:hover:not(:disabled) { background-color: #e9ecef; }
+        .scenario-feedback { padding: 10px; border-radius: 5px; margin-top: 10px; }
+        .try-again-btn { background-color: #6c757d !important; }
+
+        /* --- Activity 3.3: Link Checker --- */
+        #example-links button { margin: 5px 5px 5px 0; font-size: 0.9em !important; padding: 8px 12px !important; background-color: #6c757d !important; margin-top: 5px !important; }
+        #link-analysis-results { border: 1px solid #ddd; padding: 20px; margin-top: 20px; border-radius: 8px; }
+        #analysis-verdict { font-size: 1.5em; font-weight: bold; text-align: center; margin-bottom: 15px; }
+        #analysis-details { list-style: '⚠️ '; padding-left: 20px; }
+        #analysis-details li { margin-bottom: 8px; }
+
+        /* --- General Feedback Colors --- */
+        .feedback-correct { background-color: #d4edda; color: #155724; }
+        .feedback-incorrect { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="title-container">
+            <h1>Thực hành</h1>
+            <h2>CẢNH GIÁC NƠI CÔNG CỘNG 🕵️‍♂️🌐</h2>
+        </div>
+
+        <div id="tab-navigation">
+            <button id="show-activity-3-1" class="tab-btn active">Hoạt động 3.1: Wi-Fi Giả mạo</button>
+            <button id="show-activity-3-2" class="tab-btn">Hoạt động 3.2: Máy tính Công cộng</button>
+            <button id="show-activity-3-3" class="tab-btn">Hoạt động 3.3: Kiểm tra Link</button>
+        </div>
+
+        <div id="activity-3-1" class="activity-container"></div>
+        <div id="activity-3-2" class="activity-container hidden"></div>
+        <div id="activity-3-3" class="activity-container hidden"></div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const containers = {
+            '3-1': document.getElementById('activity-3-1'),
+            '3-2': document.getElementById('activity-3-2'),
+            '3-3': document.getElementById('activity-3-3')
+        };
+        const tabs = {
+            '3-1': document.getElementById('show-activity-3-1'),
+            '3-2': document.getElementById('show-activity-3-2'),
+            '3-3': document.getElementById('show-activity-3-3')
+        };
+        
+        const initialHtml = {
+            '3-1': `
+                <div class="instructions">"Wi-Fi công cộng rất tiện lợi, nhưng cũng tiềm ẩn nhiều rủi ro. Hãy tập nhận diện những 'cạm bẫy' nhé!"</div>
+                <p><strong>Nhiệm vụ:</strong> Chọn (click/tap) vào các mạng Wi-Fi mà bạn cho là <strong>không an toàn</strong> hoặc đáng ngờ.</p>
+                <ul id="wifi-list">
+                    <li class="wifi-item" data-suspicious="false" data-reason="Tên chính thức, có bảo mật."><span class="icon">📶🔒</span> CafeNguyen_Official</li>
+                    <li class="wifi-item" data-suspicious="true" data-reason="Sai chính tả 'Starbucks' và thêm từ 'Fast' gây chú ý."><span class="icon">📶</span> Starbuck_FreeWiFi_Fast</li>
+                    <li class="wifi-item" data-suspicious="false" data-reason="Tên chuẩn, có bảo mật."><span class="icon">📶🔒</span> Starbucks_Free_WiFi</li>
+                    <li class="wifi-item" data-suspicious="true" data-reason="Tên quá chung chung, không có bảo mật, dễ bị giả mạo."><span class="icon">📶</span> FreeAirportWiFi</li>
+                    <li class="wifi-item" data-suspicious="true" data-reason="Tên router mặc định, không bảo mật, có thể là điểm truy cập giả."><span class="icon">📶</span> LINK_SYS_GUEST</li>
+                </ul>
+                <div id="wifi-check-feedback" style="text-align:center; font-weight:bold; margin-top:15px;"></div>
+                <div style="text-align:center;">
+                    <button id="check-wifi-btn" class="button">Kiểm tra kết quả</button>
+                </div>`,
+            '3-2': `
+                <div class="instructions">"Khi sử dụng thiết bị không phải của mình, mỗi hành động nhỏ đều quan trọng. Hãy xem bạn phản ứng thế nào."</div>
+                <div class="scenario-tabs">
+                    <button class="scenario-tab active" data-scenario="1">Kịch bản 1</button>
+                    <button class="scenario-tab" data-scenario="2">Kịch bản 2</button>
+                </div>
+                <div id="scenario1" class="scenario-box">
+                    <h3>Bạn cần kiểm tra email gấp trên máy tính ở thư viện. Bạn sẽ:</h3>
+                    <div class="scenario-options">
+                        <button class="option" data-correct="false" data-explanation="Đăng nhập trực tiếp rất rủi ro. Keylogger có thể được cài sẵn để đánh cắp mật khẩu của bạn.">A. Đăng nhập ngay vào email.</button>
+                        <button class="option" data-correct="false" data-explanation="Chỉ phòng được người khác nhìn, không phòng được phần mềm độc hại đã cài sẵn trong máy.">B. Kiểm tra xem có ai nhìn trộm không rồi đăng nhập.</button>
+                        <button class="option" data-correct="true" data-explanation="Rất tốt! Chế độ ẩn danh giúp không lưu lại tài khoản, mật khẩu, lịch sử duyệt web.">C. Mở tab ẩn danh (Incognito/Private) để đăng nhập. Sau khi dùng xong, đảm bảo đăng xuất.</button>
+                    </div>
+                    <div class="scenario-feedback"></div>
+                    <div style="text-align:center;"><button class="button try-again-btn hidden">Thử lại</button></div>
+                </div>
+                <div id="scenario2" class="scenario-box hidden">
+                    <h3>Bạn thấy một USB lạ cắm sẵn ở máy. Bạn sẽ:</h3>
+                    <div class="scenario-options">
+                        <button class="option" data-correct="false" data-explanation="Rất nguy hiểm! USB lạ có thể chứa virus hoặc mã độc tự động chạy và lây nhiễm ngay khi bạn mở ra.">A. Mở ra xem có gì thú vị không.</button>
+                        <button class="option" data-correct="true" data-explanation="An toàn! Phớt lờ và không sử dụng nó là một hành động tự bảo vệ thông minh.">B. Rút ra và không sử dụng.</button>
+                        <button class="option" data-correct="true" data-explanation="Tuyệt vời! Báo cho người quản lý là hành động có trách nhiệm, giúp bảo vệ cả những người dùng sau.">C. Báo cho người quản lý thiết bị.</button>
+                    </div>
+                    <div class="scenario-feedback"></div>
+                     <div style="text-align:center;"><button class="button try-again-btn hidden">Thử lại</button></div>
+                </div>`,
+            '3-3': `
+                <div class="instructions">"Đường link lạ có thể dẫn bạn đến những nơi nguy hiểm. Hãy tập 'soi' kỹ trước khi click!"</div>
+                <p><strong>Chọn đường link bên dưới để kiểm tra:</strong></p>
+                <div id="example-links" style="margin-top: 10px;">
+                    <button class="button">https://www.google.com</button>
+                    <button class="button">http://faceboook-login.com</button>
+                    <button class="button">https://www.microsоft.com</button>
+                    <button class="button">https://acb.com.vn.update-security.net/</button>
+                    <button class="button">https://bit.ly/TaiLieuMienPhi</button>
+                    <button class="button">http://192.168.1.1/shopee-login/</button>
+                </div>
+                <div id="link-analysis-results" class="hidden">
+                    <h3 id="analysis-verdict"></h3>
+                    <ul id="analysis-details"></ul>
+                </div>`
+        };
+
+        function switchTab(targetKey) {
+            for (const key in containers) {
+                const isActive = (key === targetKey);
+                tabs[key].classList.toggle('active', isActive);
+                containers[key].classList.toggle('hidden', !isActive);
+                if (isActive) {
+                    containers[key].innerHTML = initialHtml[key];
+                    initializeActivityListeners(key);
+                }
+            }
+        }
+
+        for (const key in tabs) {
+            tabs[key].addEventListener('click', () => switchTab(key));
+        }
+
+        function initializeActivityListeners(activeKey) {
+            if (activeKey === '3-1') initActivity3_1();
+            if (activeKey === '3-2') initActivity3_2();
+            if (activeKey === '3-3') initActivity3_3();
+        }
+
+        function initActivity3_1() {
+             const wifiList = document.getElementById('wifi-list');
+            const checkBtn = document.getElementById('check-wifi-btn');
+            const feedbackEl = document.getElementById('wifi-check-feedback');
+
+            wifiList.querySelectorAll('.wifi-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (!checkBtn.disabled) {
+                       item.classList.toggle('selected');
+                       item.style.backgroundColor = item.classList.contains('selected') ? '#e2f6f8' : '';
+                    }
+                });
+            });
+
+            checkBtn.addEventListener('click', () => {
+                checkBtn.disabled = true;
+                let missedCount = 0;
+                
+                wifiList.querySelectorAll('.wifi-item').forEach(item => {
+                    item.style.backgroundColor = '';
+                    const isSuspicious = item.dataset.suspicious === 'true';
+                    const isSelected = item.classList.contains('selected');
+                    const reason = item.dataset.reason;
+                    const feedbackSpan = document.createElement('span');
+                    feedbackSpan.className = 'feedback';
+                    
+                    if (isSelected && isSuspicious) {
+                        item.style.backgroundColor = 'var(--success-color)'; item.style.color = 'white';
+                        feedbackSpan.textContent = "Chính xác! " + reason;
+                    } else if (isSelected && !isSuspicious) {
+                        item.style.backgroundColor = 'var(--warning-color)';
+                        feedbackSpan.textContent = "Mạng này có vẻ ổn.";
+                    } else if (!isSelected && isSuspicious) {
+                        item.style.backgroundColor = 'var(--danger-color)'; item.style.color = 'white';
+                        feedbackSpan.textContent = "Bỏ lỡ! " + reason;
+                        missedCount++;
+                    }
+                    if(item.querySelector('.feedback') == null) item.appendChild(feedbackSpan);
+                });
+
+                if (missedCount > 0) {
+                    feedbackEl.textContent = "Bạn đã bỏ sót " + missedCount + " mạng nguy hiểm. Hãy kiểm tra lại nhé!";
+                    feedbackEl.style.color = 'var(--danger-color)';
+                } else {
+                    feedbackEl.textContent = "Làm tốt lắm! Bạn đã nhận diện đúng các điểm đáng ngờ.";
+                    feedbackEl.style.color = 'var(--success-color)';
+                }
+            });
+        }
+        function initActivity3_2() {
+            const scenarioTabs = document.querySelectorAll('.scenario-tab');
+            const scenarioBoxes = document.querySelectorAll('.scenario-box');
+
+            scenarioTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    scenarioTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const targetScenario = document.getElementById(`scenario${tab.dataset.scenario}`);
+                    scenarioBoxes.forEach(box => box.classList.add('hidden'));
+                    targetScenario.classList.remove('hidden');
+                });
+            });
+
+            document.querySelectorAll('.scenario-box .option').forEach(button => {
+                button.addEventListener('click', e => {
+                    const scenarioBox = e.target.closest('.scenario-box');
+                    const options = scenarioBox.querySelectorAll('.option');
+                    const feedbackDiv = scenarioBox.querySelector('.scenario-feedback');
+                    const tryAgainBtn = scenarioBox.querySelector('.try-again-btn');
+                    
+                    options.forEach(btn => btn.disabled = true);
+                    
+                    const isCorrect = e.target.dataset.correct === 'true';
+                    feedbackDiv.innerHTML = e.target.dataset.explanation;
+                    feedbackDiv.className = `scenario-feedback ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`;
+                    tryAgainBtn.classList.remove('hidden');
+                });
+            });
+
+            document.querySelectorAll('.try-again-btn').forEach(button => {
+                button.addEventListener('click', e => {
+                    const scenarioBox = e.target.closest('.scenario-box');
+                    const options = scenarioBox.querySelectorAll('.option');
+                    const feedbackDiv = scenarioBox.querySelector('.scenario-feedback');
+                    
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                    });
+                    feedbackDiv.innerHTML = '';
+                    feedbackDiv.className = 'scenario-feedback';
+                    button.classList.add('hidden');
+                });
+            });
+        }
+        
+        function initActivity3_3() {
+            const resultsDiv = document.getElementById('link-analysis-results');
+            const verdictEl = document.getElementById('analysis-verdict');
+            const detailsUl = document.getElementById('analysis-details');
+
+            function analyzeAndDisplay(url) {
+                const lowerUrl = url.toLowerCase();
+                const issues = [];
+
+                if (!lowerUrl.startsWith('https://')) {
+                    issues.push("Giao thức không phải là <strong>HTTPS</strong>, dữ liệu không được mã hóa.");
+                }
+                if (lowerUrl.includes('faceboook') || lowerUrl.includes('gogle')) {
+                    issues.push("Phát hiện lỗi chính tả trong tên miền quen thuộc (Typosquatting).");
+                }
+                if (/[^\x00-\x7F]/.test(url)) {
+                    issues.push("Phát hiện ký tự không phải Latin (VD: Cyrillic 'о' thay vì 'o'). Đây là kỹ thuật tấn công <strong>Homograph</strong>.");
+                }
+                if (lowerUrl.includes('acb.com.vn.update-security.net')) {
+                    issues.push("Tên miền thương hiệu ('acb.com.vn') bị dùng làm tên miền phụ. <strong>Tên miền đúng (lừa đảo) là: update-security.net</strong>.");
+                }
+                if (lowerUrl.includes('bit.ly') || lowerUrl.includes('tinyurl')) {
+                    issues.push("Sử dụng dịch vụ rút gọn link. <strong>Link đích đã bị che giấu</strong>, tiềm ẩn rủi ro cao.");
+                }
+                 if (/^http(s)?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(lowerUrl)) {
+                    issues.push("Link sử dụng <strong>địa chỉ IP</strong> thay vì tên miền. Tổ chức hợp pháp rất hiếm khi làm điều này.");
+                }
+                 if (/prize|winner|free|update|secure|login|locked|khuyenmai/.test(lowerUrl) && !/(google.com|facebook.com|microsoft.com)/.test(lowerUrl)) {
+                    issues.push("Sử dụng các từ ngữ gây tò mò, cấp bách hoặc lừa đảo.");
+                }
+                 if (lowerUrl.endsWith('.xyz') || lowerUrl.endsWith('.info') || lowerUrl.endsWith('.top') || lowerUrl.endsWith('.live')) {
+                    issues.push("Sử dụng đuôi tên miền (.xyz, .info, .live...) thường liên quan đến các trang web rác hoặc lừa đảo.");
+                }
+                
+                detailsUl.innerHTML = '';
+                if (issues.length > 0) {
+                    verdictEl.textContent = "CẢNH BÁO: Link này RẤT ĐÁNG NGỜ!";
+                    verdictEl.style.color = 'var(--danger-color)';
+                    issues.forEach(issue => {
+                        const li = document.createElement('li');
+                        li.innerHTML = issue;
+                        detailsUl.appendChild(li);
+                    });
+                } else {
+                    verdictEl.textContent = "Link này có vẻ AN TOÀN";
+                    verdictEl.style.color = 'var(--success-color)';
+                    const li = document.createElement('li');
+                    li.innerHTML = "Sử dụng HTTPS và không phát hiện dấu hiệu bất thường rõ ràng. <strong>Tuy nhiên, hãy luôn cẩn trọng.</strong>";
+                    detailsUl.appendChild(li);
+                }
+                resultsDiv.classList.remove('hidden');
+            }
+
+            document.querySelectorAll('#example-links button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const url = btn.textContent;
+                    // Highlight selected button
+                    document.querySelectorAll('#example-links button').forEach(b => b.style.borderColor = '');
+                    btn.style.borderColor = 'var(--primary-color)';
+                    analyzeAndDisplay(url);
+                });
+            });
+        }
+
+        // --- Initial Load ---
+        switchTab('3-1');
+    });
+    </script>
+</body>
+</html>

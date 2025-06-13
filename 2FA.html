@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thực hành tương tác về BẢO MẬT TÀI KHOẢN</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
+
+    <style>
+        /* --- General Styles --- */
+        :root {
+            --primary-color: #007bff;
+            --primary-dark: #0056b3;
+            --background-color: #f4f6f9;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --error-color: #dc3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            padding: 10px; /* Reduced padding for mobile first */
+            margin: 0;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 680px;
+            box-sizing: border-box;
+        }
+        
+        /* --- Title Style --- */
+        .title-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .title-container h2 {
+            font-size: 1.3em;
+            font-weight: 500;
+            margin: 0;
+            color: #555;
+        }
+        .title-container h1 {
+            font-size: 2.3em;
+            margin: 5px 0 0 0;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        
+        .activity-container {
+            background-color: var(--container-bg);
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px 32px;
+        }
+
+        .instructions {
+            background-color: #e7f3ff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .button {
+            display: inline-block; background-color: var(--primary-color); color: #fff;
+            padding: 12px 24px; border: none; border-radius: 6px; font-size: 16px;
+            font-weight: bold; cursor: pointer; text-align: center;
+            transition: background-color 0.2s, transform 0.2s; margin-top: 10px;
+        }
+        .button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        
+        .input-field {
+            width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ccc;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box;
+        }
+
+        .hidden { display: none; }
+
+        /* --- Tab Navigation --- */
+        #tab-navigation {
+            display: flex;
+            margin-bottom: 0; 
+        }
+        .tab-btn {
+            flex-grow: 1; /* Allow tabs to share space */
+            background-color: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            position: relative;
+            top: 1px;
+            text-align: center;
+        }
+        .tab-btn.active {
+            background-color: var(--container-bg);
+            color: var(--primary-color);
+            border-top: 3px solid var(--primary-color);
+            border-bottom: none;
+        }
+
+        /* --- Activity 1 --- */
+        #success-container p {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 25px;
+        }
+        #recovery-codes-section {
+            background-color: #fffbe6; border: 1px solid #ffeeba; padding: 15px;
+            margin-top: 20px; border-radius: 5px; text-align: left;
+        }
+        .error-text {
+            color: var(--error-color);
+            font-size: 0.9em;
+            font-weight: 500;
+            height: 1.2em;
+            margin-top: 5px;
+        }
+
+
+        /* --- Activity 2 --- */
+        #quiz-options .option {
+            display: block; width: 100%; background-color: #f8f9fa; border: 1px solid #dee2e6;
+            padding: 15px; margin-bottom: 10px; border-radius: 6px; text-align: left; cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        #quiz-options .option:hover:not(:disabled) { background-color: #e9ecef; border-color: #adb5bd; }
+        .explanation-correct { color: #155724; font-weight: bold; }
+        .explanation-incorrect { color: #721c24; font-weight: bold; }
+        
+        /* --- NEW: Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 5px; /* Less padding on small screens */
+            }
+            .title-container h1 {
+                font-size: 1.8em; /* Smaller main title */
+            }
+             .title-container h2 {
+                font-size: 1.1em;
+            }
+            .tab-btn {
+                font-size: 0.85em; /* Smaller tab text */
+                padding: 10px 8px; /* Adjust padding */
+            }
+            .activity-container {
+                padding: 15px; /* Less padding inside container */
+            }
+            #recovery-codes-section div {
+                grid-template-columns: 1fr; /* Stack recovery codes */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="title-container">
+            <h2>Thực hành tương tác bảo mật tài khoản</h2>
+            <h1>KÍCH HOẠT LÁ CHẮN 2FA</h1>
+        </div>
+
+        <div id="tab-navigation">
+            <button id="show-activity1-btn" class="tab-btn active">Hoạt động 1: Kích hoạt 2FA</button>
+            <button id="show-activity2-btn" class="tab-btn">Hoạt động 2: Xử lý sự cố</button>
+        </div>
+
+        <div id="activity-2-1" class="activity-container">
+            </div>
+
+        <div id="activity-2-2" class="activity-container hidden">
+            <div class="instructions">
+                <p>"Đôi khi sự cố xảy ra. Hãy xem bạn sẽ xử lý thế nào nếu không thể dùng phương thức 2FA thông thường."</p>
+            </div>
+            <div class="step-content" style="border:none; padding:0; margin-top:0;">
+                <h3>Tình huống</h3>
+                <p><strong>Bạn làm mất điện thoại đã cài ứng dụng xác thực. Bạn sẽ làm gì để lấy lại quyền truy cập tài khoản?</strong></p>
+                <div id="quiz-options">
+                    <button class="option" data-answer="A">A. Thử đoán mật khẩu nhiều lần.</button>
+                    <button class="option" data-answer="B">B. Sử dụng mã khôi phục đã lưu trước đó.</button>
+                    <button class="option" data-answer="C">C. Tạo tài khoản mới.</button>
+                    <button class="option" data-answer="D">D. Liên hệ ngay với bộ phận hỗ trợ của dịch vụ.</button>
+                </div>
+                <div id="quiz-detailed-feedback" class="hidden">
+                    <h4>Phân tích các phương án:</h4>
+                    <ul>
+                        <li><span class="explanation-incorrect">[SAI]</span> <strong>A. Thử đoán mật khẩu nhiều lần:</strong> Hành động này rất nguy hiểm. Hầu hết các dịch vụ sẽ tạm thời khóa tài khoản của bạn sau vài lần nhập sai để chống lại các cuộc tấn công dò mật khẩu.</li>
+                        <li><span class="explanation-correct">[ĐÚNG]</span> <strong>B. Sử dụng mã khôi phục đã lưu trước đó:</strong> Đây chính là mục đích của mã khôi phục! Chúng được tạo ra để làm "chìa khóa dự phòng" cho những trường hợp khẩn cấp như thế này.</li>
+                        <li><span class="explanation-incorrect">[SAI]</span> <strong>C. Tạo tài khoản mới:</strong> Đây là giải pháp cực chẳng đã và sẽ khiến bạn mất toàn bộ dữ liệu (email, hình ảnh, danh bạ,...) liên kết với tài khoản cũ.</li>
+                        <li><span class="explanation-correct">[ĐÚNG]</span> <strong>D. Liên hệ ngay với bộ phận hỗ trợ của dịch vụ:</strong> Nếu bạn không lưu mã khôi phục, đây là kênh chính thức để lấy lại tài khoản. Họ sẽ có quy trình xác minh danh tính để giúp bạn.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    // --- The JavaScript remains the same as it handles logic, not layout. ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const activity1Container = document.getElementById('activity-2-1');
+        const activity2Container = document.getElementById('activity-2-2');
+        const showActivity1Btn = document.getElementById('show-activity1-btn');
+        const showActivity2Btn = document.getElementById('show-activity2-btn');
+
+        let correctCode = '';
+        const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+        const templates = {
+            step1: `
+                <div class="instructions"><p>"Xác thực hai yếu tố (2FA) giống như bạn có thêm một lớp khóa cho ngôi nhà của mình. Hãy cùng trải nghiệm cách kích hoạt lá chắn này!"</p></div>
+                <h3>Bắt đầu Kích hoạt Bảo mật</h3>
+                <ol>
+                    <li>Vào <strong>Cài đặt Bảo mật</strong> của tài khoản.</li>
+                    <li>Tìm mục <strong>Xác thực hai yếu tố / Đăng nhập 2 bước</strong>.</li>
+                    <li>Chọn <strong>"Bắt đầu Thiết lập"</strong> để tiếp tục.</li>
+                </ol>
+                <button id="start-setup-btn" class="button">Bắt đầu Thiết lập</button>`,
+            step2: `
+                <h3>Chọn phương thức xác thực</h3>
+                <p>Bạn muốn nhận mã xác thực qua đâu?</p>
+                <button id="choose-app-btn" class="button">Ứng dụng xác thực</button>
+                <button id="choose-sms-btn" class="button" style="background-color: #6c757d;">Tin nhắn SMS (Mô phỏng)</button>`,
+            step3a: `
+                <h3>Thiết lập bằng Ứng dụng xác thực</h3>
+                <p>1. <strong>Dùng camera điện thoại của bạn</strong> để quét mã QR thật bên dưới.</p>
+                <p>2. Điện thoại của bạn sẽ hiển thị một mã gồm 6 chữ số.</p>
+                <p>3. Nhập mã đó vào ô và nhấn Xác nhận.</p>
+                <div id="qr-code-container" style="width: 160px; height: 160px; margin: 20px auto; padding: 5px; border: 1px solid #ccc; border-radius: 8px; background: white;"></div>
+                <input type="text" id="app-code-input" class="input-field" placeholder="Nhập mã 6 chữ số" maxlength="6">
+                <button id="confirm-app-code-btn" class="button">Xác nhận</button>`,
+            step3b: `
+                <h3>Thiết lập bằng Tin nhắn SMS</h3>
+                <p>1. Nhập một số điện thoại giả lập (ví dụ: 0987654321).</p>
+                <p>2. Nhấn "Gửi mã". Một tin nhắn SMS ảo sẽ xuất hiện.</p>
+                <p>3. Nhập mã bạn nhận được vào ô và nhấn Xác nhận.</p>
+                <input type="tel" id="phone-input" class="input-field" placeholder="Nhập SĐT giả lập">
+                <div id="phone-error" class="error-text"></div>
+                <button id="send-sms-btn" class="button">Gửi mã</button>
+                <div id="virtual-sms" class="instructions hidden" style="margin-top: 20px;">
+                    <p><strong>[Dịch vụ]</strong>: Mã xác minh của bạn là <strong id="sms-code-display"></strong>. Không chia sẻ mã này.</p>
+                </div>
+                <input type="text" id="sms-code-input" class="input-field hidden" placeholder="Nhập mã 6 chữ số" maxlength="6">
+                <button id="confirm-sms-code-btn" class="button hidden">Xác nhận</button>`,
+            step4Success: `
+                <div id="success-container">
+                    <p>Chúc mừng xác thực thành công!</p>
+                </div>
+                <div id="recovery-codes-section">
+                    <h4>QUAN TRỌNG: Lưu lại mã khôi phục của bạn!</h4>
+                    <p>Sử dụng các mã này để đăng nhập nếu bạn mất quyền truy cập vào điện thoại. Hãy lưu chúng ở một nơi an toàn.</p>
+                    <div style="font-family: 'Courier New', Courier, monospace; font-weight: bold; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <span>1d8f-9a3b</span> <span>c7g2-4h5k</span> <span>e9p4-m6n8</span> <span>r3t7-w1z2</span>
+                        <span>y5i0-u8o9</span> <span>f4b6-v2c1</span> <span>k9l3-j7h5</span> <span>s2d8-g1q9</span>
+                    </div>
+                </div>`,
+            step4Error: `
+                <div style="text-align: center;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1047/1047711.png" alt="Error" style="width:80px; margin-bottom:15px;">
+                    <p style="color: #721c24; font-size: 1.2em; font-weight: bold;">Mã không chính xác. Vui lòng thử lại.</p>
+                    <button id="try-again-btn" class="button">Thử lại</button>
+                </div>`
+        };
+
+        function renderStep(stepTemplate) {
+            activity1Container.innerHTML = stepTemplate;
+        }
+
+        function resetActivity1() {
+            renderStep(templates.step1);
+        }
+
+        function switchTab(activeTab, inactiveTab, activeContainer, inactiveContainer) {
+            activeTab.classList.add('active');
+            inactiveTab.classList.remove('active');
+            activeContainer.classList.remove('hidden');
+            inactiveContainer.classList.add('hidden');
+            resetActivities();
+        }
+
+        showActivity1Btn.addEventListener('click', () => {
+            switchTab(showActivity1Btn, showActivity2Btn, activity1Container, activity2Container);
+        });
+
+        showActivity2Btn.addEventListener('click', () => {
+            switchTab(showActivity2Btn, showActivity1Btn, activity2Container, activity1Container);
+        });
+
+        function resetActivities() {
+            resetActivity1();
+            const quizOptions = document.getElementById('quiz-options');
+            quizOptions.querySelectorAll('.option').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('correct', 'incorrect');
+            });
+            document.getElementById('quiz-detailed-feedback').classList.add('hidden');
+        }
+
+        activity1Container.addEventListener('click', function(e) {
+            const targetId = e.target.id;
+            if (targetId === 'start-setup-btn') {
+                renderStep(templates.step2);
+            } 
+            else if (targetId === 'try-again-btn') {
+                resetActivity1();
+            }
+            else if (targetId === 'choose-app-btn') {
+                renderStep(templates.step3a);
+                correctCode = generateCode();
+                new QRCode(document.getElementById('qr-code-container'), { text: correctCode, width: 150, height: 150 });
+            } 
+            else if (targetId === 'confirm-app-code-btn') {
+                const appCodeInput = document.getElementById('app-code-input');
+                if (appCodeInput && appCodeInput.value === correctCode && correctCode !== '') {
+                    renderStep(templates.step4Success);
+                } else {
+                    renderStep(templates.step4Error);
+                }
+            }
+            else if (targetId === 'choose-sms-btn') {
+                renderStep(templates.step3b);
+            }
+            else if (targetId === 'send-sms-btn') {
+                const phoneInput = document.getElementById('phone-input');
+                const phoneError = document.getElementById('phone-error');
+                const phoneNumber = phoneInput.value.trim();
+                phoneError.textContent = '';
+                if (phoneNumber === '') {
+                    phoneError.textContent = 'Vui lòng nhập số điện thoại.';
+                    return;
+                }
+                if (!/^\d+$/.test(phoneNumber)) {
+                    phoneError.textContent = 'Số điện thoại chỉ được chứa chữ số.';
+                    return;
+                }
+                if (!phoneNumber.startsWith('0')) {
+                    phoneError.textContent = 'Số điện thoại hợp lệ phải bắt đầu bằng số 0.';
+                    return;
+                }
+                if (phoneNumber.length < 9 || phoneNumber.length > 11) {
+                    phoneError.textContent = 'Số điện thoại phải có độ dài 9, 10 hoặc 11 chữ số.';
+                    return;
+                }
+                correctCode = generateCode();
+                document.getElementById('sms-code-display').textContent = correctCode;
+                document.getElementById('virtual-sms').classList.remove('hidden');
+                document.getElementById('sms-code-input').classList.remove('hidden');
+                document.getElementById('confirm-sms-code-btn').classList.remove('hidden');
+                e.target.disabled = true;
+            }
+            else if (targetId === 'confirm-sms-code-btn') {
+                const smsCodeInput = document.getElementById('sms-code-input');
+                if (smsCodeInput && smsCodeInput.value === correctCode && correctCode !== '') {
+                    renderStep(templates.step4Success);
+                } else {
+                    renderStep(templates.step4Error);
+                }
+            }
+        });
+
+        const optionButtons = document.querySelectorAll('#quiz-options .option');
+        optionButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                optionButtons.forEach(btn => btn.disabled = true);
+                const clickedButton = event.target;
+                const isCorrect = (clickedButton.dataset.answer === 'B' || clickedButton.dataset.answer === 'D');
+                clickedButton.classList.add(isCorrect ? 'correct' : 'incorrect');
+                document.getElementById('quiz-detailed-feedback').classList.remove('hidden');
+            });
+        });
+
+        resetActivity1();
+    });
+    </script>
+</body>
+</html>

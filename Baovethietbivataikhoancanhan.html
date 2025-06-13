@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thực hành: Thiết lập chế độ bảo vệ</title>
+    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #28a745;
+            --primary-dark: #218838;
+            --background-color: #f4f6f9;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --danger-color: #dc3545;
+            --off-color: #6c757d;
+            --code-bg: #e9ecef;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            margin: 0;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 720px;
+            box-sizing: border-box;
+        }
+        
+        .title-container h1 {
+            font-size: 2.1em;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .activity-container {
+            background-color: var(--container-bg);
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px 32px;
+            min-height: 400px;
+        }
+
+        .instructions {
+            background-color: #d4edda;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+        
+        .button {
+            display: inline-block; background-color: var(--primary-color); color: #fff;
+            padding: 12px 24px; border: none; border-radius: 6px; font-size: 16px;
+            font-weight: bold; cursor: pointer; text-align: center;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .button:disabled { background-color: #ccc; cursor: not-allowed; transform: none; }
+        
+        .hidden { display: none; }
+
+        /* --- Tab Navigation --- */
+        #tab-navigation { display: flex; flex-wrap: wrap; margin-bottom: 0; }
+        .tab-btn {
+            flex-grow: 1; background-color: #e9ecef; color: #495057; border: 1px solid #dee2e6;
+            padding: 12px 10px; font-size: 0.9em; font-weight: 600; border-radius: 8px 8px 0 0;
+            cursor: pointer; transition: all 0.2s ease-in-out; position: relative;
+            top: 1px; text-align: center;
+        }
+        .tab-btn.active {
+            background-color: var(--container-bg); color: var(--primary-color);
+            border-top: 3px solid var(--primary-color); border-bottom: 1px solid var(--container-bg);
+        }
+
+        /* --- Simulation Specific Styles --- */
+        .simulation-window { border: 1px solid #ccc; border-radius: 8px; padding: 20px; text-align: center; transition: opacity 0.5s; }
+        .progress-bar { width: 100%; background-color: #e9ecef; border-radius: 5px; overflow: hidden; margin: 15px 0; }
+        .progress-bar-inner { height: 20px; width: 0%; background-color: var(--primary-color); transition: width 2s ease-in-out; }
+        .simulation-icon { font-size: 3em; }
+        
+        #password-strength-meter { display: flex; gap: 5px; margin-top: 10px; }
+        #password-strength-meter div { flex: 1; height: 8px; background-color: #e9ecef; border-radius: 4px; transition: background-color 0.3s; }
+        #password-strength-text { font-weight: bold; margin-top: 5px; }
+
+        .toggle-switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--off-color); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        #firewall-status { font-size: 1.2em; font-weight: bold; margin-top: 15px; }
+
+        .guide-container { margin-top: 20px; }
+        .guide-tabs { display: flex; border-bottom: 1px solid #ccc; }
+        .guide-tab { padding: 10px 15px; cursor: pointer; background: #f1f1f1; border: 1px solid #ccc; border-bottom: none; border-radius: 5px 5px 0 0; }
+        .guide-tab.active { background: #fff; border-bottom: 1px solid #fff; font-weight: bold; }
+        .guide-content { background: #fff; padding: 20px; border: 1px solid #ccc; border-top: none; text-align: left; }
+        .guide-pane ul { padding-left: 20px; }
+        code {
+            background-color: var(--code-bg); color: #c7254e; padding: 3px 6px;
+            border-radius: 4px; font-family: 'Courier New', Courier, monospace; font-size: 0.95em;
+        }
+        
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            body { padding: 5px; }
+            .title-container h1 { font-size: 1.8em; }
+            .tab-btn { font-size: 0.8em; padding: 10px 5px; }
+            .activity-container { padding: 15px; }
+            #password-criteria li { font-size: 0.9em; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="title-container">
+            <h1>Thực hành: Thiết lập chế độ bảo vệ thiết bị và tài khoản cá nhân</h1>
+        </div>
+
+        <div id="tab-navigation">
+            <button id="show-step-1" class="tab-btn active">Bước 1: Cập nhật</button>
+            <button id="show-step-2" class="tab-btn">Bước 2: Diệt Virus</button>
+            <button id="show-step-3" class="tab-btn">Bước 3: Mật khẩu</button>
+            <button id="show-step-4" class="tab-btn">Bước 4: Tường lửa</button>
+            <button id="show-step-5" class="tab-btn">Bước 5: Kích hoạt 2FA</button>
+        </div>
+
+        <div id="activity-container" class="activity-container">
+            </div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('activity-container');
+        const tabs = document.querySelectorAll('.tab-btn');
+        let currentCode = '';
+
+        // --- Reusable Guide Tab Function ---
+        function createGuideTabsHTML(content) {
+            return `
+                <div class="guide-container">
+                    <h4>✅ Hoàn tất! Giờ hãy xem hướng dẫn chi tiết cho thiết bị của bạn:</h4>
+                    <div class="guide-tabs">
+                        <button class="guide-tab active" data-target="pc">Hướng dẫn trên PC</button>
+                        <button class="guide-tab" data-target="android">Hướng dẫn trên Android</button>
+                        <button class="guide-tab" data-target="ios">Hướng dẫn trên iOS</button>
+                    </div>
+                    <div class="guide-content">
+                        <div class="guide-pane active" id="guide-pc">${content.pc}</div>
+                        <div class="guide-pane hidden" id="guide-android">${content.android}</div>
+                        <div class="guide-pane hidden" id="guide-ios">${content.ios}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function attachGuideTabListeners(scopeElement) {
+            scopeElement.querySelectorAll('.guide-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const targetId = e.target.dataset.target;
+                    scopeElement.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    scopeElement.querySelectorAll('.guide-pane').forEach(pane => {
+                        pane.classList.toggle('hidden', pane.id !== `guide-${targetId}`);
+                    });
+                });
+            });
+        }
+
+
+        // --- Main Tab Switching ---
+        function switchTab(e) {
+            tabs.forEach(tab => tab.classList.remove('active'));
+            const selectedTab = e.currentTarget;
+            selectedTab.classList.add('active');
+            const step = selectedTab.id.replace('show-step-', '');
+            initializeActivity(step);
+        }
+
+        tabs.forEach(tab => tab.addEventListener('click', switchTab));
+
+        // --- Activity Initializers ---
+        function initializeActivity(step) {
+            if (step === '1') initStep1();
+            if (step === '2') initStep2();
+            if (step === '3') initStep3();
+            if (step === '4') initStep4();
+            if (step === '5') initStep5();
+        }
+        
+        function initStep1() {
+            container.innerHTML = `
+                <div class="instructions"><strong>Mô phỏng:</strong> Cập nhật hệ điều hành là tuyến phòng thủ đầu tiên. Nhấn nút bên dưới để mô phỏng việc kiểm tra và cài đặt.</div>
+                <div class="simulation-window">
+                    <div class="simulation-icon">💻</div>
+                    <h3>Cập nhật Hệ điều hành</h3>
+                    <p>Hệ thống của bạn có các bản cập nhật bảo mật quan trọng cần cài đặt.</p>
+                    <button id="update-os-btn" class="button">Kiểm tra và Cập nhật ngay</button>
+                    <div id="update-progress" class="progress-bar hidden"><div class="progress-bar-inner"></div></div>
+                    <div id="final-content"></div>
+                </div>`;
+            
+            const updateBtn = document.getElementById('update-os-btn');
+            const progressBar = document.getElementById('update-progress');
+            const progressBarInner = progressBar.querySelector('.progress-bar-inner');
+            const finalContent = document.getElementById('final-content');
+
+            updateBtn.addEventListener('click', () => {
+                updateBtn.disabled = true;
+                progressBar.classList.remove('hidden');
+                setTimeout(() => { progressBarInner.style.width = '100%'; }, 100);
+                setTimeout(() => {
+                    const guideContent = {
+                        pc: `<ul><li><strong>Windows:</strong> Vào <code>Cài đặt → Cập nhật & Bảo mật</code>.</li><li><strong>macOS:</strong> Vào <code>System Preferences → Software Update</code>.</li></ul>`,
+                        android: `<ul><li>Vào <code>Cài đặt → Cập nhật hệ thống</code> (Tên có thể khác nhau tùy hãng).</li></ul>`,
+                        ios: `<ul><li>Vào <code>Cài đặt → Cài đặt chung → Cập nhật phần mềm</code>.</li></ul>`
+                    };
+                    finalContent.innerHTML = createGuideTabsHTML(guideContent);
+                    attachGuideTabListeners(finalContent);
+                }, 2100);
+            });
+        }
+
+        function initStep2() {
+            container.innerHTML = `
+                <div class="instructions"><strong>Mô phỏng:</strong> Chạy phần mềm diệt virus thường xuyên để tìm và loại bỏ các phần mềm độc hại.</div>
+                <div class="simulation-window">
+                    <div class="simulation-icon">🛡️</div>
+                    <h3>Antivirus Simulation</h3>
+                    <div id="scan-content">
+                        <p>Sẵn sàng quét toàn bộ hệ thống để tìm mối đe dọa.</p>
+                        <button id="scan-btn" class="button">Bắt đầu Quét</button>
+                    </div>
+                    <div id="scan-progress" class="hidden">
+                        <p>Đang quét các tệp...</p>
+                        <div class="progress-bar"><div class="progress-bar-inner"></div></div>
+                    </div>
+                    <div id="scan-results" class="hidden"></div>
+                </div>`;
+            
+            const scanBtn = document.getElementById('scan-btn');
+            const scanContent = document.getElementById('scan-content');
+            const progressDiv = document.getElementById('scan-progress');
+            const progressBarInner = progressDiv.querySelector('.progress-bar-inner');
+            const resultsDiv = document.getElementById('scan-results');
+            const simulationWindow = container.querySelector('.simulation-window');
+
+            scanBtn.addEventListener('click', () => {
+                scanContent.classList.add('hidden');
+                progressDiv.classList.remove('hidden');
+                setTimeout(() => { progressBarInner.style.width = '100%'; }, 100);
+                setTimeout(() => {
+                    progressDiv.classList.add('hidden');
+                    resultsDiv.classList.remove('hidden');
+                    resultsDiv.innerHTML = `
+                        <h4 style="color:var(--danger-color);">Phát hiện 1 mối đe dọa!</h4>
+                        <p>Tên: Trojan.Generic.FakeThreat (Mô phỏng)</p>
+                        <button id="quarantine-btn" class="button" style="background-color:var(--danger-color);">Cách ly & Loại bỏ</button>`;
+                    
+                    document.getElementById('quarantine-btn').addEventListener('click', () => {
+                         const guideContent = {
+                            pc: `<ul><li>Cài đặt phần mềm diệt virus (Windows Defender, Avast, Kaspersky Free…).</li><li>Chạy quét toàn bộ hệ thống (Full Scan) và xử lý tất cả cảnh báo.</li></ul>`,
+                            android: `<ul><li>Cài ứng dụng quét mã độc từ CH Play nếu cần (ví dụ: Malwarebytes, AVG Mobile).</li><li>Thực hiện quét nhanh (Quick Scan).</li></ul>`,
+                            ios: `<ul><li>iOS có cơ chế bảo mật sandbox mạnh mẽ, thường không cần ứng dụng diệt virus. Hãy đảm bảo chỉ cài app từ App Store.</li></ul>`
+                        };
+                        simulationWindow.innerHTML = createGuideTabsHTML(guideContent);
+                        attachGuideTabListeners(simulationWindow);
+                    });
+                }, 2100);
+            });
+        }
+
+        function initStep3() {
+            container.innerHTML = `
+                 <div class="instructions"><strong>Mô phỏng:</strong> Tạo một mật khẩu mạnh cho tài khoản của bạn. Mật khẩu mạnh cần đáp ứng đủ các tiêu chí bên dưới.</div>
+                <div class="simulation-window">
+                    <h3>Tạo mật khẩu mới</h3>
+                    <input type="text" id="password-input" placeholder="Nhập mật khẩu của bạn vào đây" style="width:100%; padding:10px; text-align:center; font-size:1.2em;">
+                    <div id="password-strength-meter"><div></div><div></div><div></div><div></div></div>
+                    <p id="password-strength-text">Độ mạnh: Rất yếu</p>
+                    <ul id="password-criteria" style="text-align:left; list-style:none; padding:0; margin-top:15px;">
+                        <li data-criterion="length">❌ Tối thiểu 8 ký tự</li>
+                        <li data-criterion="uppercase">❌ Chứa chữ hoa (A-Z)</li>
+                        <li data-criterion="lowercase">❌ Chứa chữ thường (a-z)</li>
+                        <li data-criterion="number">❌ Chứa số (0-9)</li>
+                        <li data-criterion="symbol">❌ Chứa ký tự đặc biệt (!, @, #...)</li>
+                    </ul>
+                     <button id="confirm-password-btn" class="button" disabled>Xác nhận Mật khẩu</button>
+                </div>`;
+            
+            const passwordInput = document.getElementById('password-input');
+            const strengthMeter = document.getElementById('password-strength-meter');
+            const strengthText = document.getElementById('password-strength-text');
+            const criteriaList = document.getElementById('password-criteria');
+            const confirmBtn = document.getElementById('confirm-password-btn');
+
+            passwordInput.addEventListener('input', () => {
+                const password = passwordInput.value;
+                let score = 0;
+                const criteria = {
+                    length: password.length >= 8, uppercase: /[A-Z]/.test(password),
+                    lowercase: /[a-z]/.test(password), number: /[0-9]/.test(password),
+                    symbol: /[\W_]/.test(password)
+                };
+                for (const key in criteria) {
+                    const li = criteriaList.querySelector(`[data-criterion="${key}"]`);
+                    if (criteria[key]) {
+                        score++;
+                        li.innerHTML = `✅ ${li.textContent.substring(2)}`;
+                        li.style.color = 'var(--primary-color)';
+                    } else {
+                        li.innerHTML = `❌ ${li.textContent.substring(2)}`;
+                        li.style.color = 'var(--danger-color)';
+                    }
+                }
+                strengthMeter.querySelectorAll('div').forEach((div, index) => {
+                    div.style.backgroundColor = score > index ? 'var(--primary-color)' : '#e9ecef';
+                });
+                if (score <= 1) strengthText.textContent = "Độ mạnh: Rất yếu";
+                else if (score <= 3) strengthText.textContent = "Độ mạnh: Yếu";
+                else if (score === 4) strengthText.textContent = "Độ mạnh: Trung bình";
+                else if (score === 5) strengthText.textContent = "Độ mạnh: Mạnh";
+                confirmBtn.disabled = score < 5;
+            });
+             confirmBtn.addEventListener('click', () => {
+                container.querySelector('.simulation-window').innerHTML = `<h3>✅ Đặt mật khẩu mạnh thành công!</h3><p>Hãy sử dụng trình quản lý mật khẩu như Bitwarden, LastPass để lưu trữ an toàn.</p>`;
+             });
+        }
+        
+        function initStep4() {
+             container.innerHTML = `
+                 <div class="instructions"><strong>Mô phỏng:</strong> Tường lửa (Firewall) giống như một người bảo vệ, kiểm soát các kết nối ra vào thiết bị của bạn. Hãy đảm bảo nó luôn được bật.</div>
+                 <div class="simulation-window">
+                    <div class="simulation-icon">🧱</div>
+                    <h3>Windows Defender Firewall</h3>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="firewall-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <div id="firewall-status">Trạng thái: ĐÃ TẮT</div>
+                 </div>`;
+            const toggle = document.getElementById('firewall-toggle');
+            const status = document.getElementById('firewall-status');
+            const simulationWindow = container.querySelector('.simulation-window');
+
+            toggle.addEventListener('change', () => {
+                if (toggle.checked) {
+                    status.textContent = "Trạng thái: ĐÃ BẬT";
+                    status.style.color = 'var(--primary-color)';
+                    toggle.disabled = true;
+                     setTimeout(() => {
+                        const guideContent = {
+                            pc: `<ul><li><strong>Windows:</strong> Vào <code>Control Panel → System and Security → Windows Defender Firewall → Bật</code>.</li><li><strong>macOS:</strong> Vào <code>System Preferences → Security & Privacy → Firewall → Bật</code>.</li></ul>`,
+                            android: `<ul><li>Tường lửa trên Android thường được quản lý tự động bởi hệ điều hành và không yêu cầu cấu hình.</li></ul>`,
+                            ios: `<ul><li>Tường lửa trên iOS được tích hợp sẵn và không yêu cầu người dùng cấu hình thủ công.</li></ul>`
+                        };
+                        simulationWindow.innerHTML = createGuideTabsHTML(guideContent);
+                        attachGuideTabListeners(simulationWindow);
+                    }, 1500);
+                }
+            });
+        }
+        
+        // --- Step 5: 2FA (UPDATED) ---
+        function initStep5() {
+             container.innerHTML = `
+                <div class="instructions"><strong>Mô phỏng:</strong> Kích hoạt Xác thực hai yếu tố (2FA) để thêm một lớp bảo vệ vững chắc cho tài khoản.</div>
+                <div class="simulation-window" id="2fa-window">
+                    <h3>Xác thực hai yếu tố (2FA)</h3>
+                    <p>Bảo vệ tài khoản của bạn khỏi bị truy cập trái phép.</p>
+                    <button class="button" id="start-2fa-btn">Bắt đầu thiết lập</button>
+                </div>`;
+
+             container.querySelector('#start-2fa-btn').addEventListener('click', () => {
+                const window2FA = document.getElementById('2fa-window');
+                window2FA.innerHTML = `
+                    <h3>Thiết lập bằng Ứng dụng xác thực</h3>
+                    <p><strong>1. Dùng camera điện thoại của bạn để quét mã QR này.</strong></p>
+                     <div id="qr-code-container" style="width: 160px; height: 160px; margin: 20px auto; padding: 5px; border: 1px solid #ccc; border-radius: 8px;"></div>
+                    <p>2. Nhập 6 chữ số đó vào ô bên dưới để xác nhận.</p>
+                    <input type="text" id="2fa-code-input" placeholder="_ _ _ _ _ _" maxlength="6" style="text-align:center; font-size:1.5em; letter-spacing: 5px; border: 1px solid #ccc; padding:10px; width: 200px; margin-top: 10px;">
+                    <p id="2fa-error" style="color:var(--danger-color); height: 1em; font-weight: bold;"></p>
+                    <button class="button" id="confirm-2fa-btn" style="margin-top:5px;">Xác nhận</button>`;
+                
+                currentCode = Math.floor(100000 + Math.random() * 900000).toString();
+                // Encode the plain number, not the OTPAuth URI
+                new QRCode(document.getElementById("qr-code-container"), { text: currentCode, width: 150, height: 150 });
+                
+                document.getElementById('confirm-2fa-btn').addEventListener('click', () => {
+                    const userInput = document.getElementById('2fa-code-input').value;
+                    const errorP = document.getElementById('2fa-error');
+                    if (userInput === currentCode) {
+                        window2FA.innerHTML = `
+                            <h3>Kích hoạt 2FA thành công!</h3>
+                            <p style="color:var(--primary-color); font-size: 3em;">✅</p>
+                            <div style="background:#fffbe6; padding:15px; border-radius:8px; text-align:left;">
+                                <h4>QUAN TRỌNG: Lưu lại mã khôi phục!</h4>
+                                <p>Sử dụng các mã này để đăng nhập nếu bạn mất điện thoại.</p>
+                                <div style="font-family: 'Courier New'; font-weight: bold; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <span>1d8f-9a3b</span> <span>c7g2-4h5k</span> <span>e9p4-m6n8</span> <span>r3t7-w1z2</span>
+                                </div>
+                            </div>`;
+                    } else {
+                        errorP.textContent = "Mã không chính xác. Vui lòng thử lại.";
+                    }
+                });
+             });
+        }
+        
+        // --- Initial Load ---
+        tabs[0].click();
+    });
+    </script>
+</body>
+</html>
